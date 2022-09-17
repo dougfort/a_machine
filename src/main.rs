@@ -7,7 +7,7 @@ mod keyboard;
 mod sprites;
 
 #[derive(Clone)]
-enum Alphabet {
+pub enum Alphabet {
     Blank,
     Zero,
     One,

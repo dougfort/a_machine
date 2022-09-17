@@ -7,7 +7,7 @@ use crate::step;
 pub fn keyboard_input(
     keys: Res<Input<KeyCode>>,
     args: Res<cli::Args>,
-    mut commands: Commands,
+    commands: Commands,
     sprites: Res<sprites::Sprites>,
 ) {
     if args.step && keys.just_pressed(KeyCode::Space) {

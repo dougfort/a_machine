@@ -11,9 +11,7 @@ pub struct Args {
 }
 
 impl FromWorld for Args {
-    fn from_world(world: &mut World) -> Self {
-        let args = Args::from_args();
-
-        args
+    fn from_world(_world: &mut World) -> Self {
+        Args::from_args()
     }
 }
