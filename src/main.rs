@@ -5,18 +5,7 @@ use rand::Rng;
 mod cli;
 mod keyboard;
 mod sprites;
-
-#[derive(Clone)]
-pub enum Alphabet {
-    Blank,
-    Zero,
-    One,
-}
-
-#[derive(Component, Clone)]
-struct Symbol(Alphabet);
-#[derive(Component)]
-struct TapeIndex(usize);
+mod tape;
 
 fn main() {
     App::new()
@@ -40,9 +29,9 @@ fn step(mut commands: Commands, sprites: Res<sprites::Sprites>) {
 
     for i in 0..SPRITE_COUNT {
         let symbol = match rng.gen_range(0..2) {
-            0 => Alphabet::Zero,
-            1 => Alphabet::One,
-            _ => Alphabet::Blank,
+            0 => tape::Alphabet::Zero,
+            1 => tape::Alphabet::One,
+            _ => tape::Alphabet::Blank,
         };
         let sprite = sprites.get(&symbol);
         commands
@@ -55,7 +44,7 @@ fn step(mut commands: Commands, sprites: Res<sprites::Sprites>) {
                 )),
                 ..Default::default()
             })
-            .insert(Symbol(symbol))
-            .insert(TapeIndex(i));
+            .insert(tape::Symbol(symbol))
+            .insert(tape::TapeIndex(i));
     }
 }

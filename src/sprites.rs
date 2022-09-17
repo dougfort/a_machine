@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::tape;
+
 pub struct Sprites([Handle<Image>; 3]);
 
 impl FromWorld for Sprites {
@@ -14,10 +16,10 @@ impl FromWorld for Sprites {
 }
 
 impl Sprites {
-    pub fn get(&self, symbol: &crate::Alphabet) -> Handle<Image> {
+    pub fn get(&self, symbol: &tape::Alphabet) -> Handle<Image> {
         match symbol {
-            crate::Alphabet::Zero => self.0[0].clone(),
-            crate::Alphabet::One => self.0[1].clone(),
+            tape::Alphabet::Zero => self.0[0].clone(),
+            tape::Alphabet::One => self.0[1].clone(),
             _ => self.0[2].clone(),
         }
     }
