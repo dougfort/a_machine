@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 use crate::cli;
 use crate::sprites;
-use crate::step;
 use crate::tape;
 
 pub fn keyboard_input(
@@ -13,7 +12,6 @@ pub fn keyboard_input(
     tape: Res<tape::Tape>
 ) {
     if args.step && keys.just_pressed(KeyCode::Space) {
-        println!("keyboard_input");
-        step(commands, sprites, tape);
+        println!("Space");
     }
 }

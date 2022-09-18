@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
 
@@ -5,6 +7,7 @@ mod cli;
 mod keyboard;
 mod sprites;
 mod tape;
+mod refresher;
 
 fn main() {
     App::new()
@@ -15,30 +18,11 @@ fn main() {
         .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system(setup)
         .add_system(keyboard::keyboard_input)
+        .add_system(refresher::refresh)
         .run();
 }
 
 fn setup(mut commands: Commands) {
     commands.spawn_bundle(Camera2dBundle::default());
-}
-
-fn step(mut commands: Commands, sprites: Res<sprites::Sprites>, tape: Res<tape::Tape>) {
-    const SPRITE_WIDTH: f32 = 32.0;
-
-    tape.symbols.iter().enumerate().for_each(|(i, symbol)| {
-        println!("{}: {:?}", i, symbol);
-        let sprite = sprites.get(&symbol);
-        commands
-            .spawn_bundle(SpriteBundle {
-                texture: sprite,
-                transform: Transform::from_translation(Vec3::new(
-                    (i as f32 - (tape.symbols.len() as f32 / 2.0)) * SPRITE_WIDTH,
-                    0.0,
-                    0.0,
-                )),
-                ..Default::default()
-            })
-            .insert(tape::Symbol(symbol.clone()))
-            .insert(tape::TapeIndex(i));
-    });
+    commands.insert_resource(refresher::RefreshTimer(Timer::new(Duration::from_secs(1), true)));
 }
