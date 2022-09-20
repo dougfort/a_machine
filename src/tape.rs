@@ -1,14 +1,11 @@
 use bevy::prelude::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub enum Alphabet {
     Blank,
     Zero,
     One,
 }
-
-#[derive(Component, Clone, Debug)]
-pub struct Symbol(pub Alphabet);
 
 #[derive(Component)]
 pub struct Tape{

@@ -19,13 +19,12 @@ pub fn refresh(mut commands: Commands,
         return;
     }
 
-    for (entity, tape_index) in query.iter() {
+    query.iter().for_each(|(entity, _tape_index)| {
         commands.entity(entity).despawn();
-    }
+    });
 
     tape.symbols.iter().enumerate().for_each(|(i, symbol)| {
-        println!("{}: {:?}", i, symbol);
-        let sprite = sprites.get(&symbol);
+        let sprite = sprites.get(symbol);
         commands
             .spawn_bundle(SpriteBundle {
                 texture: sprite,
@@ -36,7 +35,6 @@ pub fn refresh(mut commands: Commands,
                 )),
                 ..Default::default()
             })
-            .insert(tape::Symbol(symbol.clone()))
             .insert(tape::TapeIndex(i));
     });
 }

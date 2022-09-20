@@ -1,18 +1,24 @@
 use bevy::prelude::*;
 
 use crate::cli;
-use crate::sprites;
+use crate::state;
 use crate::tape;
+use crate::rules;
 
 pub fn keyboard_input(
-    keys: Res<Input<KeyCode>>,
     args: Res<cli::Args>,
-    commands: Commands,
-    sprites: Res<sprites::Sprites>,
+    keys: Res<Input<KeyCode>>,
+    rule_set: Res<rules::RuleSet>,
+    state: ResMut<state::State>,
     mut tape: ResMut<tape::Tape>
 ) {
-    if keys.just_pressed(KeyCode::Space) {
-        println!("Space");
+    if args.step && keys.just_pressed(KeyCode::Space) {
+        println!("Step");
+        rules::step(rule_set, state, tape);
+        return;
+    }
+    if keys.just_pressed(KeyCode::Delete) {
+        println!("Delete");
         tape.set(tape::Alphabet::Blank);
     }
     if keys.just_pressed(KeyCode::Key0) {
