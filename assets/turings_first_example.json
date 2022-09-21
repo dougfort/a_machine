@@ -1,0 +1,29 @@
+[{
+    "from_state": "b",
+    "from_symbol": " ",
+    "to_state": "c",
+    "to_symbol": "0",
+    "direction": "R"
+},
+{
+    "from_state": "c",
+    "from_symbol": " ",
+    "to_state": "e",
+    "to_symbol": " ",
+    "direction": "R"
+},
+{
+    "from_state": "e",
+    "from_symbol": " ",
+    "to_state": "f",
+    "to_symbol": "1",
+    "direction": "R"
+},
+{
+    "from_state": "f",
+    "from_symbol": " ",
+    "to_state": "b",
+    "to_symbol": " ",
+    "direction": "R"
+}
+]

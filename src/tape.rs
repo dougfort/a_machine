@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Tape{
+pub struct Tape {
     pub symbols: Vec<String>,
     pub index: usize,
 }

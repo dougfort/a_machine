@@ -1,10 +1,14 @@
 /// transition rules
 use bevy::{prelude::*, utils::HashMap};
+use std::fs::File;
+use std::io::BufReader;
+
+use serde::Deserialize;
 
 use crate::state;
 use crate::tape;
 
-#[derive(Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Rule {
     from_state: String,
     from_symbol: String,
@@ -16,39 +20,16 @@ pub struct Rule {
 pub struct RuleSet(HashMap<(String, String), Rule>);
 
 impl FromWorld for RuleSet {
-    fn from_world(_world: &mut World) -> Self {
-        // Turing's very first example
-        // https://en.wikipedia.org/wiki/Turing_machine_examples
-        let rules = vec![
-            Rule {
-                from_state: "b".to_string(),
-                from_symbol: " ".to_string(),
-                to_state: "c".to_string(),
-                to_symbol: "0".to_string(),
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: "c".to_string(),
-                from_symbol: " ".to_string(),
-                to_state: "e".to_string(),
-                to_symbol: " ".to_string(),
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: "e".to_string(),
-                from_symbol: " ".to_string(),
-                to_state: "f".to_string(),
-                to_symbol: "1".to_string(),
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: "f".to_string(),
-                from_symbol: " ".to_string(),
-                to_state: "b".to_string(),
-                to_symbol: " ".to_string(),
-                direction: "R".to_string(),
-            },
-        ];
+    fn from_world(world: &mut World) -> Self {
+        let args = world.get_resource::<crate::cli::Args>().unwrap();
+
+        let path = &args.rules_file;
+        let file = File::open(path).expect("file not found");
+        let reader = BufReader::new(file);
+    
+        // Read the JSON contents of the file as a Vector or Rule`.
+        let rules: Vec<Rule> = serde_json::from_reader(reader).expect("file is not valid JSON");
+
         let rule_set = HashMap::from_iter(
             rules
                 .into_iter()
