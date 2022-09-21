@@ -1,54 +1,35 @@
 /// transition rules
 use bevy::{prelude::*, utils::HashMap};
+use std::fs::File;
+use std::io::BufReader;
+
+use serde::Deserialize;
 
 use crate::state;
 use crate::tape;
 
-#[derive(Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Rule {
-    from_state: state::State,
-    from_symbol: tape::Alphabet,
-    to_state: state::State,
-    to_symbol: tape::Alphabet,
+    from_state: String,
+    from_symbol: String,
+    to_state: String,
+    to_symbol: String,
     direction: String,
 }
 
-pub struct RuleSet(HashMap<(state::State, tape::Alphabet), Rule>);
+pub struct RuleSet(HashMap<(String, String), Rule>);
 
 impl FromWorld for RuleSet {
-    fn from_world(_world: &mut World) -> Self {
-        // Turing's very first example
-        // https://en.wikipedia.org/wiki/Turing_machine_examples
-        let rules = vec![
-            Rule {
-                from_state: state::State("b".to_string()),
-                from_symbol: tape::Alphabet::Blank,
-                to_state: state::State("c".to_string()),
-                to_symbol: tape::Alphabet::Zero,
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: state::State("c".to_string()),
-                from_symbol: tape::Alphabet::Blank,
-                to_state: state::State("e".to_string()),
-                to_symbol: tape::Alphabet::Blank,
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: state::State("e".to_string()),
-                from_symbol: tape::Alphabet::Blank,
-                to_state: state::State("f".to_string()),
-                to_symbol: tape::Alphabet::One,
-                direction: "R".to_string(),
-            },
-            Rule {
-                from_state: state::State("f".to_string()),
-                from_symbol: tape::Alphabet::Blank,
-                to_state: state::State("b".to_string()),
-                to_symbol: tape::Alphabet::Blank,
-                direction: "R".to_string(),
-            },
-        ];
+    fn from_world(world: &mut World) -> Self {
+        let args = world.get_resource::<crate::cli::Args>().unwrap();
+
+        let path = &args.rules_file;
+        let file = File::open(path).expect("file not found");
+        let reader = BufReader::new(file);
+    
+        // Read the JSON contents of the file as a Vector or Rule`.
+        let rules: Vec<Rule> = serde_json::from_reader(reader).expect("file is not valid JSON");
+
         let rule_set = HashMap::from_iter(
             rules
                 .into_iter()
@@ -60,13 +41,13 @@ impl FromWorld for RuleSet {
 }
 
 pub fn step(rule_set: Res<RuleSet>, mut state: ResMut<state::State>, mut tape: ResMut<tape::Tape>) {
-    let from_state = state.clone();
+    let from_state = state.0.clone();
     let from_symbol = tape.get().clone();
     let rule = rule_set.0.get(&(from_state, from_symbol));
     if let Some(rule) = rule {
         println!("State: {:?}; Rule: {:?}", state, rule);
-        tape.set(rule.to_symbol.clone());
-        state.0 = rule.to_state.0.to_string();
+        tape.set(&rule.to_symbol);
+        state.0 = rule.to_state.clone();
         if rule.direction == "L" {
             tape.move_left();
         } else if rule.direction == "R" {

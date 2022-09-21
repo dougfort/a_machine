@@ -19,15 +19,15 @@ pub fn keyboard_input(
     }
     if keys.just_pressed(KeyCode::Delete) {
         println!("Delete");
-        tape.set(tape::Alphabet::Blank);
+        tape.set(" ");
     }
     if keys.just_pressed(KeyCode::Key0) {
         println!("0");
-        tape.set(tape::Alphabet::Zero);
+        tape.set("0'.to_string());");
     }
     if keys.just_pressed(KeyCode::Key1) {
         println!("1");
-        tape.set(tape::Alphabet::One);
+        tape.set("1");
     }
     if keys.just_pressed(KeyCode::Left) {
         println!("Left");
