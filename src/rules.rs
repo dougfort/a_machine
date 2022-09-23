@@ -22,6 +22,8 @@ pub struct Rule {
 }
 
 pub struct RuleSet(HashMap<(String, String), Rule>);
+#[derive(Debug)]
+pub struct StepCount(pub usize);
 
 impl FromWorld for RuleSet {
     fn from_world(world: &mut World) -> Self {
@@ -45,6 +47,7 @@ impl FromWorld for RuleSet {
 }
 
 pub fn step(
+    step_count: Res<StepCount>,
     mut commands: Commands,
     rule_set: Res<RuleSet>,
     mut state: ResMut<state::State>,
@@ -52,11 +55,17 @@ pub fn step(
     sprite_array: Res<sprites::SpriteArray>,
     query: Query<(Entity, &tape::TapeIndex)>,
 ) {
+    if !step_count.is_changed() {
+        return;
+    }
     let from_state = state.0.clone();
     let from_symbol = tape.get().clone();
     let rule = rule_set.0.get(&(from_state, from_symbol));
     if let Some(rule) = rule {
-        println!("State: {}; Rule: {:?}", state.0, rule);
+        println!(
+            "Step: {}; State: {}; Rule: {:?}",
+            step_count.0, state.0, rule
+        );
 
         tape.set(&rule.to_symbol);
         state.0 = rule.to_state.clone();
@@ -68,7 +77,10 @@ pub fn step(
 
         for (entity, tape_index) in query.iter() {
             if tape_index.0 == tape.index {
-                println!("tape_index.0 = {}; tape.index = {}", tape_index.0, tape.index);
+                println!(
+                    "tape_index.0 = {}; tape.index = {}",
+                    tape_index.0, tape.index
+                );
                 let sprite = sprite_array.get(&rule.to_symbol);
                 commands.entity(entity).insert_bundle(SpriteBundle {
                     texture: sprite,
