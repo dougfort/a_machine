@@ -28,16 +28,18 @@ fn main() {
         .init_resource::<sprites::SpriteArray>()
         .init_resource::<tape::Tape>()
         .init_resource::<rules::RuleSet>()
+        .insert_resource(rules::StepCount(0))
         .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system(setup)
         .add_system(keyboard::keyboard_input)
+        .add_system(rules::step)
         .run();
 }
 
 fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites::SpriteArray>) {
     commands.spawn_bundle(Camera2dBundle::default());
     commands.insert_resource(state::State(args.initial_state.clone()));
-    
+
     const STARTING_SYMBOL: &str = " ";
     for i in 0..SPRITE_COUNT {
         let sprite = sprite_array.get(STARTING_SYMBOL);
