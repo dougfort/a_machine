@@ -42,16 +42,14 @@ fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites
 
     const STARTING_SYMBOL: &str = " ";
     for i in 0..SPRITE_COUNT {
+        let x = (i as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH;
+        println!("setup x: {}", x);
         let sprite = sprite_array.get(STARTING_SYMBOL);
         commands
             .spawn_bundle(SpriteBundle {
                 texture: sprite,
                 visibility: Visibility { is_visible: false },
-                transform: Transform::from_translation(Vec3::new(
-                    (i as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH,
-                    0.0,
-                    0.0,
-                )),
+                transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
                 ..Default::default()
             })
             .insert(tape::TapeIndex(i))

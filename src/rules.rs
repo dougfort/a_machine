@@ -81,15 +81,13 @@ pub fn step(
                     "tape_index.0 = {}; tape.index = {}",
                     tape_index.0, tape.index
                 );
+                commands.entity(entity).remove_bundle::<SpriteBundle>();
+                let x = (tape_index.0 as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH;
                 let sprite = sprite_array.get(&rule.to_symbol);
                 commands.entity(entity).insert_bundle(SpriteBundle {
                     texture: sprite,
                     visibility: Visibility { is_visible: true },
-                    transform: Transform::from_translation(Vec3::new(
-                        (tape_index.0 as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH,
-                        0.0,
-                        0.0,
-                    )),
+                    transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
                     ..Default::default()
                 });
                 break;
