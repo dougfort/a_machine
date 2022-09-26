@@ -41,11 +41,11 @@ fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites
     commands.insert_resource(state::State(args.initial_state.clone()));
 
     const STARTING_SYMBOL: &str = " ";
-    for i in 0..SPRITE_COUNT {
+    let entities = (0..SPRITE_COUNT).map(|i| {
         let x = (i as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH;
         println!("setup x: {}", x);
         let sprite = sprite_array.get(STARTING_SYMBOL);
-        commands
+        let id = commands
             .spawn_bundle(SpriteBundle {
                 texture: sprite,
                 visibility: Visibility { is_visible: false },
@@ -53,6 +53,10 @@ fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites
                 ..Default::default()
             })
             .insert(tape::TapeIndex(i))
-            .insert(sprites::SpriteSymbol(STARTING_SYMBOL.to_string()));
-    }
+            .insert(sprites::SpriteSymbol(STARTING_SYMBOL.to_string()))
+            .id();
+        (id, x)
+    });
+    let entity_vec: Vec<(Entity, f32)> = entities.collect();
+    commands.insert_resource(rules::EntityArray(entity_vec));
 }

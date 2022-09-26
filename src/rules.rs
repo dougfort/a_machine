@@ -9,9 +9,6 @@ use crate::sprites;
 use crate::state;
 use crate::tape;
 
-use crate::SPRITE_COUNT;
-use crate::SPRITE_WIDTH;
-
 #[derive(Deserialize, Debug)]
 pub struct Rule {
     from_state: String,
@@ -24,6 +21,9 @@ pub struct Rule {
 pub struct RuleSet(HashMap<(String, String), Rule>);
 #[derive(Debug)]
 pub struct StepCount(pub usize);
+
+#[derive(Debug)]
+pub struct EntityArray(pub Vec<(Entity, f32)>);
 
 impl FromWorld for RuleSet {
     fn from_world(world: &mut World) -> Self {
@@ -53,7 +53,7 @@ pub fn step(
     mut state: ResMut<state::State>,
     mut tape: ResMut<tape::Tape>,
     sprite_array: Res<sprites::SpriteArray>,
-    query: Query<(Entity, &tape::TapeIndex)>,
+    entity_array: Res<EntityArray>,
 ) {
     if !step_count.is_changed() {
         return;
@@ -75,24 +75,17 @@ pub fn step(
             tape.move_right();
         }
 
-        for (entity, tape_index) in query.iter() {
-            if tape_index.0 == tape.index {
-                println!(
-                    "tape_index.0 = {}; tape.index = {}",
-                    tape_index.0, tape.index
-                );
-                commands.entity(entity).remove_bundle::<SpriteBundle>();
-                let x = (tape_index.0 as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH;
-                let sprite = sprite_array.get(&rule.to_symbol);
-                commands.entity(entity).insert_bundle(SpriteBundle {
-                    texture: sprite,
-                    visibility: Visibility { is_visible: true },
-                    transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
-                    ..Default::default()
-                });
-                break;
-            }
-        }
+        println!("tape.index = {}", tape.index);
+
+        let (entity, x) = entity_array.0[tape.index];
+        commands.entity(entity).remove_bundle::<SpriteBundle>();
+        let sprite = sprite_array.get(&rule.to_symbol);
+        commands.entity(entity).insert_bundle(SpriteBundle {
+            texture: sprite,
+            visibility: Visibility { is_visible: true },
+            transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
+            ..Default::default()
+        });
     } else {
         println!("No rule for State: {:?}; Symbol: {:?}", state, tape.get());
     }
