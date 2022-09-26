@@ -36,13 +36,17 @@ fn main() {
         .run();
 }
 
+pub fn center_sprite_index() -> usize {
+    SPRITE_COUNT / 2
+}
+
 fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites::SpriteArray>) {
     commands.spawn_bundle(Camera2dBundle::default());
     commands.insert_resource(state::State(args.initial_state.clone()));
 
     const STARTING_SYMBOL: &str = " ";
     let entities = (0..SPRITE_COUNT).map(|i| {
-        let x = (i as f32 - (SPRITE_COUNT as f32 / 2.0)) * SPRITE_WIDTH;
+        let x = (i as f32 - center_sprite_index() as f32) * SPRITE_WIDTH;
         println!("setup x: {}", x);
         let sprite = sprite_array.get(STARTING_SYMBOL);
         let id = commands
