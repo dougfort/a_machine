@@ -9,6 +9,7 @@ use crate::sprites;
 use crate::state;
 use crate::tape;
 
+use crate::center_sprite_index;
 #[derive(Deserialize, Debug)]
 pub struct Rule {
     from_state: String,
@@ -75,17 +76,42 @@ pub fn step(
             tape.move_right();
         }
 
-        println!("tape.index = {}", tape.index);
+        // clear the sprites
+        entity_array.0.iter().for_each(|(entity, _)| {
+            commands.entity(*entity).remove_bundle::<SpriteBundle>();
+        });
 
-        let (entity, x) = entity_array.0[tape.index];
-        commands.entity(entity).remove_bundle::<SpriteBundle>();
-        let sprite = sprite_array.get(&rule.to_symbol);
+        // set the current tape head over the center sprite
+        let tape_head_index = tape.index;
+        let center_sprite_index = center_sprite_index();
+
+        println!("tape_head_index: {}; center_sprite_index: {}; tape: {:?}", tape_head_index, center_sprite_index, tape.symbols);
+
+        let symbol = tape.get_at(tape_head_index);
+        let (entity, x) = entity_array.0[center_sprite_index];
         commands.entity(entity).insert_bundle(SpriteBundle {
-            texture: sprite,
+            texture: sprite_array.get(symbol),
             visibility: Visibility { is_visible: true },
             transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
             ..Default::default()
         });
+
+        for i in 0..center_sprite_index {
+            let j = center_sprite_index - i - 1;
+            println!("i: {}; j: {}", i, j);
+            let k = tape_head_index - i - 1;
+            let symbol = tape.get_at(k);
+            let (entity, x) = entity_array.0[j];
+            commands.entity(entity).insert_bundle(SpriteBundle {
+                texture: sprite_array.get(symbol),
+                visibility: Visibility { is_visible: true },
+                transform: Transform::from_translation(Vec3::new(x, 0.0, 0.0)),
+                ..Default::default()
+            });
+            if k == 0 {
+                break;
+            }
+        }
     } else {
         println!("No rule for State: {:?}; Symbol: {:?}", state, tape.get());
     }

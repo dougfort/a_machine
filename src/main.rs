@@ -13,6 +13,7 @@ const WINDOW_WIDTH: f32 = 1000.;
 const WINDOW_HEIGHT: f32 = 600.;
 
 const SPRITE_WIDTH: f32 = 32.0;
+const SPRITE_HEIGHT: f32 = 32.0;
 const SPRITE_COUNT: usize = (WINDOW_WIDTH / SPRITE_WIDTH) as usize - 1;
 
 fn main() {
@@ -40,7 +41,12 @@ pub fn center_sprite_index() -> usize {
     SPRITE_COUNT / 2
 }
 
-fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites::SpriteArray>) {
+fn setup(
+    mut commands: Commands,
+    args: Res<cli::Args>,
+    sprite_array: Res<sprites::SpriteArray>,
+    asset_server: Res<AssetServer>,
+) {
     commands.spawn_bundle(Camera2dBundle::default());
     commands.insert_resource(state::State(args.initial_state.clone()));
 
@@ -62,5 +68,16 @@ fn setup(mut commands: Commands, args: Res<cli::Args>, sprite_array: Res<sprites
         (id, x)
     });
     let entity_vec: Vec<(Entity, f32)> = entities.collect();
+
+    let (_, x) = entity_vec[center_sprite_index()];
+    let y = -SPRITE_HEIGHT;
+    let head_arrow_sprite: Handle<Image> = asset_server.load("up_arrow.png");
+    commands.spawn_bundle(SpriteBundle {
+        texture: head_arrow_sprite,
+        visibility: Visibility { is_visible: true },
+        transform: Transform::from_translation(Vec3::new(x, y, 0.0)),
+        ..Default::default()
+    });
+
     commands.insert_resource(rules::EntityArray(entity_vec));
 }
