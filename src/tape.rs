@@ -17,8 +17,16 @@ impl Tape {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.symbols.len()
+    }    
+
     pub fn get(&self) -> &String {
         &self.symbols[self.index]
+    }
+
+    pub fn get_at(&self, i: usize) -> &String {
+        &self.symbols[i]
     }
 
     pub fn set(&mut self, symbol: &str) {
